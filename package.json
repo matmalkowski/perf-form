@@ -1,0 +1,38 @@
+{
+  "name": "perf-form",
+  "version": "0.0.1",
+  "description": "React.js forms, performant way 🔥",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.js",
+  "browser": "lib/index.umd.js",
+  "types": "lib/index.d.ts",
+  "author": "Maciej Malkowski",
+  "license": "MIT",
+  "scripts": {
+    "semantic-release": "semantic-release -e semantic-release-monorepo",
+    "prebuild": "rimraf lib",
+    "build": "rollup -c && yarn emit-declarations",
+    "watch": "rollup -c -w",
+    "typecheck": "tsc",
+    "emit-declarations": "tsc -p tsconfig.json -d --noEmit false --emitDeclarationOnly --isolatedModules false --declarationDir \"./lib/\""
+  },
+  "peerDependencies": {
+    "react": "^16.11.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.6.0",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "@babel/preset-typescript": "^7.6.0",
+    "react": "^16.11.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.26.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "typescript": "^3.6.4"
+  }
+}
