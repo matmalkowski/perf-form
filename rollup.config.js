@@ -11,7 +11,7 @@ const extensions = ['.ts', '.tsx', '.js', '.jsx'];
 const external = [...Object.keys(pkg.peerDependencies || {})];
 
 const plugins = [
-  commonjs({ include: /node_modules/ }),
+  commonjs(),
   // Allows node_modules resolution
   resolve({ extensions, mainFields: ['module', 'main'] }),
 

@@ -1,23 +1,39 @@
-import React from "react";
-import PerfFormContext from "./Context";
+import React from 'react';
+import { PerfFormContext, DispatchContext } from '../Context';
+import { Values, FormState } from '../types';
+import formReducer, { Action } from './formReducer';
+import Observable from '../utils/Observable';
 
-type FormProps = {};
+export type FormProps<TValues extends Values> = {
+  initialValues: TValues;
+};
 
-const Form: React.FC<FormProps> = props => {
-  const { children } = props;
-  const [valuesState] = React.useState({});
+type Props<T> = React.PropsWithChildren<FormProps<T>>;
+const Form = <TFormValues extends Values = Values>(
+  props: Props<TFormValues>
+) => {
+  const { children, initialValues } = props;
+  const [state, dispatch] = React.useReducer<
+  React.Reducer<FormState<TFormValues>, Action<TFormValues>>
+  >(formReducer, { values: initialValues });
 
-  const handleChange = () => {};
+  const refObservable = React.useRef(new Observable());
 
-  const getCtx = () => ({
-    values: { ...valuesState },
-    handleChange
-  });
+  React.useEffect(() => {
+    refObservable.current.notify();
+  }, [state]);
+
+  const ctx = React.useMemo(() => ({
+    getState: () => state,
+    observable: refObservable.current
+  }), [state]);
 
   return (
-    <PerfFormContext.Provider value={getCtx()}>
-      <form>{children}</form>
-    </PerfFormContext.Provider>
+    <DispatchContext.Provider value={dispatch}>
+      <PerfFormContext.Provider value={ctx}>
+        <form>{children}</form>
+      </PerfFormContext.Provider>
+    </DispatchContext.Provider>
   );
 };
 
