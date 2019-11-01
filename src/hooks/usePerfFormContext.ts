@@ -1,7 +1,8 @@
 import React from 'react';
 import { PerfFormContext } from '../Context';
+import { FormContext, Values } from '../types';
 
-const usePerfFormContext = () => {
+const usePerfFormContext = <TValues extends Values>(): FormContext<TValues> => {
   const context = React.useContext(PerfFormContext);
 
   return context;

@@ -11,12 +11,14 @@ const usePrevious = <T extends {}>(value: T) => {
   return ref.current;
 };
 
-type ProviderProps<TValues = Values> = {
+type ProviderProps<TValues extends Values> = {
   state: FormState<TValues>,
   dispatch: React.Dispatch<Action<TValues>>
 }
 
-const Provider: React.FC<ProviderProps> = (props) => {
+type Props<T extends Values> = React.PropsWithChildren<ProviderProps<T>>;
+
+const Provider = <TFormValues extends Values>(props: Props<TFormValues>) => {
   const { state, dispatch, children } = props;
   const refObservable = React.useRef(new Observable());
 

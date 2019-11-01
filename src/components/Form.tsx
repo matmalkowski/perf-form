@@ -7,14 +7,14 @@ export type FormProps<TValues extends Values> = {
   initialValues: TValues;
 };
 
-type Props<T> = React.PropsWithChildren<FormProps<T>>;
-const Form = <TFormValues extends Values = Values>(
+type Props<T extends Values> = React.PropsWithChildren<FormProps<T>>;
+const Form = <TFormValues extends Values>(
   props: Props<TFormValues>
 ) => {
   const { children, initialValues } = props;
   const [state, dispatch] = React.useReducer<
   React.Reducer<FormState<TFormValues>, Action<TFormValues>>
-  >(formReducer, { values: initialValues });
+  >(formReducer, { values: initialValues, touched: {}, errors: {} });
 
 
   return (

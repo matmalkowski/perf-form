@@ -1,22 +1,22 @@
 import React from 'react';
-import { FormState, FormStore } from '../types';
+import { FormState, FormStore, Values } from '../types';
 import usePerfFormContext from './usePerfFormContext';
 import Observable from '../utils/Observable';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refEquality = (a: any, b: any) => a === b;
 
-const useSelectorWithStateAndObservable = <TValues, TPartialState>(
-  selector: (s: FormState<TValues>) => TPartialState,
+const useSelectorWithStateAndObservable = <TValues extends Values, TSelected>(
+  selector: (state: FormState<TValues>) => TSelected,
   store: FormStore<TValues>,
   observable: Observable
-) => {
+): TSelected => {
   const [, forceRender] = React.useReducer(s => s + 1, 0);
-  const latestSelector = React.useRef<(s: FormState<TValues>) => TPartialState
+  const latestSelector = React.useRef<(s: FormState<TValues>) => TSelected
   >();
-  const latestSelectedState = React.useRef<TPartialState>();
+  const latestSelectedState = React.useRef<TSelected>();
 
-  let selectedState: TPartialState;
+  let selectedState: TSelected;
 
   if (selector !== latestSelector.current) {
     selectedState = selector(store.getState());
@@ -47,11 +47,12 @@ const useSelectorWithStateAndObservable = <TValues, TPartialState>(
   return selectedState;
 };
 
+
 const createSelectorHook = () => {
-  const usePerfFormSelector = <TValues, TPartialState>(
-    selector: (s: FormState<TValues>) => TPartialState
-  ) => {
-    const { store, observable } = usePerfFormContext();
+  const usePerfFormSelector = <TValues extends Values, TSelected>(
+    selector: (state: FormState<TValues>) => TSelected
+  ): TSelected => {
+    const { store, observable } = usePerfFormContext<TValues>();
     return useSelectorWithStateAndObservable(selector, store, observable);
   };
   return usePerfFormSelector;

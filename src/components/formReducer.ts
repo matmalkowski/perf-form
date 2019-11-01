@@ -1,6 +1,6 @@
-import { FormState, Action } from '../types';
+import { FormState, Action, Values } from '../types';
 
-const formReducer = <TValues>(
+const formReducer = <TValues extends Values>(
   state: FormState<TValues>,
   action: Action<TValues>
 ): FormState<TValues> => {
