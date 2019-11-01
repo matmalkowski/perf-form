@@ -1,15 +1,16 @@
 import React from 'react';
-import { FormContext, FormState } from '../types';
+import { FormState, FormStore } from '../types';
 import usePerfFormContext from './usePerfFormContext';
+import Observable from '../utils/Observable';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refEquality = (a: any, b: any) => a === b;
 
 const useSelectorWithStateAndObservable = <TValues, TPartialState>(
   selector: (s: FormState<TValues>) => TPartialState,
-  ctx: FormContext<TValues>
+  store: FormStore<TValues>,
+  observable: Observable
 ) => {
-  console.debug(ctx);
   const [, forceRender] = React.useReducer(s => s + 1, 0);
   const latestSelector = React.useRef<(s: FormState<TValues>) => TPartialState
   >();
@@ -18,7 +19,7 @@ const useSelectorWithStateAndObservable = <TValues, TPartialState>(
   let selectedState: TPartialState;
 
   if (selector !== latestSelector.current) {
-    selectedState = selector(ctx.getState());
+    selectedState = selector(store.getState());
   } else {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     selectedState = latestSelectedState.current!;
@@ -31,8 +32,7 @@ const useSelectorWithStateAndObservable = <TValues, TPartialState>(
 
   React.useLayoutEffect(() => {
     const checkUpdates = () => {
-      const newSelectedState = latestSelector.current && latestSelector.current(ctx.getState());
-
+      const newSelectedState = latestSelector.current && latestSelector.current(store.getState());
       if (refEquality(newSelectedState, latestSelectedState.current)) {
         return;
       }
@@ -40,10 +40,10 @@ const useSelectorWithStateAndObservable = <TValues, TPartialState>(
       latestSelectedState.current = newSelectedState;
       forceRender({});
     };
-    ctx.observable.subscribe(checkUpdates);
+    observable.subscribe(checkUpdates);
     checkUpdates();
-    return () => ctx.observable.unsubscribe(checkUpdates);
-  }, [ctx]);
+    return () => observable.unsubscribe(checkUpdates);
+  }, [store, observable]);
   return selectedState;
 };
 
@@ -51,8 +51,8 @@ const createSelectorHook = () => {
   const usePerfFormSelector = <TValues, TPartialState>(
     selector: (s: FormState<TValues>) => TPartialState
   ) => {
-    const context = usePerfFormContext();
-    return useSelectorWithStateAndObservable(selector, context);
+    const { store, observable } = usePerfFormContext();
+    return useSelectorWithStateAndObservable(selector, store, observable);
   };
   return usePerfFormSelector;
 };

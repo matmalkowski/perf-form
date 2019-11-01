@@ -1,5 +1,4 @@
 {
-  
   "files.exclude": {
     "**/build": true,
     "**/coverage": true,
@@ -17,10 +16,12 @@
     }
   ],
   "eslint.options": {
-    "extensions": [".ts", ".tsx"]
+    "extensions": [
+      ".ts",
+      ".tsx"
+    ]
   },
   "typescript.tsdk": "node_modules\\typescript\\lib",
-
   "eslint.alwaysShowStatus": true,
   "eslint.autoFixOnSave": true
 }

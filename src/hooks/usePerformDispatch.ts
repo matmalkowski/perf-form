@@ -1,12 +1,11 @@
 import React from 'react';
-import { DispatchContext } from '../Context';
-import { Action } from '../components/formReducer';
-import { Values } from '../types';
+import { Values, Action } from '../types';
+import { PerfFormContext } from '../Context';
 
 const usePerfFormDispatch = (): React.Dispatch<Action<Values>> => {
-  const context = React.useContext(DispatchContext);
+  const { store } = React.useContext(PerfFormContext);
 
-  return context;
+  return store.dispatch;
 };
 
 export default usePerfFormDispatch;

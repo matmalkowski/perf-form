@@ -1,8 +1,7 @@
 import React from 'react';
-import { PerfFormContext, DispatchContext } from '../Context';
-import { Values, FormState } from '../types';
-import formReducer, { Action } from './formReducer';
-import Observable from '../utils/Observable';
+import { Values, FormState, Action } from '../types';
+import formReducer from './formReducer';
+import Provider from './Provider';
 
 export type FormProps<TValues extends Values> = {
   initialValues: TValues;
@@ -17,23 +16,11 @@ const Form = <TFormValues extends Values = Values>(
   React.Reducer<FormState<TFormValues>, Action<TFormValues>>
   >(formReducer, { values: initialValues });
 
-  const refObservable = React.useRef(new Observable());
-
-  React.useEffect(() => {
-    refObservable.current.notify();
-  }, [state]);
-
-  const ctx = React.useMemo(() => ({
-    getState: () => state,
-    observable: refObservable.current
-  }), [state]);
 
   return (
-    <DispatchContext.Provider value={dispatch}>
-      <PerfFormContext.Provider value={ctx}>
-        <form>{children}</form>
-      </PerfFormContext.Provider>
-    </DispatchContext.Provider>
+    <Provider state={state} dispatch={dispatch}>
+      <form>{children}</form>
+    </Provider>
   );
 };
 

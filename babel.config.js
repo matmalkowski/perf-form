@@ -8,7 +8,13 @@ module.exports = {
     '@babel/proposal-object-rest-spread',
   ],
   env: {
+    development: {
+      sourceMaps: true,
+      inputSourceMap: true,
+    },
     test: {
+      sourceMaps: true,
+      inputSourceMap: true,
       plugins: ['@babel/plugin-transform-modules-commonjs']
     }
   }

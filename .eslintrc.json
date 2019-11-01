@@ -20,6 +20,8 @@
       "warn",
       2
     ],
-    "arrow-parens": "off"
+    "arrow-parens": "off",
+    "import/no-unresolved": "off",
+    "no-console": "warn"
   }
 }
