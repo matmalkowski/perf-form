@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import {
-  SetFieldValueAction, SetFieldTouchedAction, SetErrorsAction, SetIsValidatingAction
+  SetFieldValueAction, SetFieldTouchedAction, SetErrorsAction, SetIsValidatingAction, SetFieldErrorAction
 } from './actions';
 
 import { FormState, Errors } from '../types';
@@ -17,12 +17,13 @@ export type ThunkAction<TValues, TDecorator> = Thunk<FormState<TValues>, Actions
 
 export type ThunkDecorator<TValues> = {
   validation: {
-    validateForm?: (values: TValues) => Errors<TValues> | string | undefined;
+    validateForm?: (values: TValues) => Errors<TValues> | undefined;
   }
 }
 
 export type Actions<TValues> =
   SetFieldValueAction<TValues> |
   SetFieldTouchedAction<TValues> |
+  SetFieldErrorAction<TValues> |
   SetErrorsAction<TValues> |
   SetIsValidatingAction

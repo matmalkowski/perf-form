@@ -30,6 +30,16 @@ SetFieldTouchedAction<TValues> =>
 
 // -----------------------------------------------------------------------------
 
+export const SET_FIELD_ERROR = 'SET_FIELD_ERROR';
+export interface SetFieldErrorAction<TValues> extends Action<typeof SET_FIELD_ERROR> {
+  payload: { field: keyof TValues; error?: string };
+}
+export const setFieldError = <TValues>(field: keyof TValues, error?: string):
+SetFieldErrorAction<TValues> =>
+  ({ type: SET_FIELD_ERROR, payload: { field, error } });
+
+// -----------------------------------------------------------------------------
+
 export const SET_ERRORS = 'SET_ERRORS';
 export interface SetErrorsAction<TValues> extends Action<typeof SET_ERRORS> {
   payload: { errors: Errors<TValues> };
@@ -51,13 +61,20 @@ SetIsValidatingAction =>
 // -----------------------------------------------------------------------------
 
 
-export const validateForm = <TValues>(): ThunkAction<TValues, ThunkDecorator<TValues>> =>
+export const validateForm = <TValues>(scopeField?: keyof TValues): ThunkAction<TValues, ThunkDecorator<TValues>> =>
   (dispatch, getState, { validation }) => {
     if (validation.validateForm) {
       const { values } = getState();
-      dispatch(setIsValidating(true));
-      const results = validation.validateForm(values) || {};
-      dispatch(setErrors(results));
-      dispatch(setIsValidating(false));
+      // dispatch(setIsValidating(true));
+      const results = validation.validateForm(values) || {} as Errors<TValues>;
+      console.debug('gonna validate those:', values);
+      console.debug('validation results', results);
+      if (scopeField) {
+        dispatch(setFieldError(scopeField, results[scopeField]));
+      } else {
+        dispatch(setErrors(results));
+      }
+
+      // dispatch(setIsValidating(false));
     }
   };

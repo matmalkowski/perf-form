@@ -17,9 +17,15 @@ const useThunkReducer = <TState, TAction, TDecorator>(
 ): [TState, ThunkDispatch<TState, TAction, TDecorator>] => {
   const [state, orgDispatch] = React.useReducer<React.Reducer<TState, TAction>>(reducer, initialState);
 
-  const getState = () => state;
+  const currentState = React.useRef(state);
 
-  const dispatch = React.useMemo(() => thunkDispatch(orgDispatch, getState, decorator), []);
+  currentState.current = state;
+
+  const dispatch = React.useMemo(() => {
+    const getState = () => currentState.current;
+    return thunkDispatch(orgDispatch, getState, decorator);
+  }, []);
+
 
   return [state, dispatch];
 };

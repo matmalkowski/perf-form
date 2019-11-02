@@ -9,8 +9,7 @@ import { Actions, ThunkDecorator } from '../store/types';
 
 export type FormProps<TValues extends Values> = {
   initialValues: TValues;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  validate?: (values: TValues) => Errors<TValues> | string | undefined;
+  validate?: (values: TValues) => Errors<TValues> | undefined;
   validateOnBlur?: boolean
   validateOnChange?: boolean,
   validateOnMount?: boolean
@@ -43,20 +42,18 @@ const Form = <TFormValues extends Values>(
       }
     });
 
-  // const runValidation = React.useCallback(() => {
-  //   if (validate) {
-  //     const errors = validate(state.values);
-  //     if (errors) {
-  //       dispatch({ type: 'SET_ERRORS', payload: { errors } });
-  //     }
-  //   }
-  // }, [state.values]);
 
   return (
     <Provider state={state} dispatch={dispatch}>
       <form>{children}</form>
     </Provider>
   );
+};
+
+Form.defaultProps = {
+  validateOnBlur: true,
+  validateOnChange: true,
+  validateOnMount: false
 };
 
 export default Form;

@@ -34,18 +34,24 @@ const usePerfFormField = <TValues extends Values>(name: keyof TValues) => {
   );
 
   React.useEffect(() => {
-    console.debug(`[${name}]:[${value}] isFirstEffect: ${isFirstEffect.current}`);
     if (shouldValidateOnMount) {
       dispatch(validateForm());
     }
-    if (isFirstEffect.current === false && shouldValidateOnChange) {
-      dispatch(validateForm());
+    if (isFirstEffect.current === false) {
+      if (shouldValidateOnBlur || shouldValidateOnChange) {
+        dispatch(validateForm(name));
+      }
     }
-    if (isFirstEffect.current === false && shouldValidateOnBlur) {
-      dispatch(validateForm());
-    }
+
     isFirstEffect.current = false;
-  }, [value, touched, shouldValidateOnMount, shouldValidateOnChange, shouldValidateOnBlur]);
+  },
+  [
+    value,
+    touched,
+    shouldValidateOnMount,
+    shouldValidateOnChange,
+    shouldValidateOnBlur
+  ]);
 
   return {
     value,
