@@ -1,8 +1,8 @@
 import React from 'react';
 import { PerfFormContext } from '../Context';
-import { FormContext, Values } from '../types';
+import { Store } from '../store/createStore';
 
-const usePerfFormContext = <TValues extends Values>(): FormContext<TValues> => {
+const usePerfFormContext = <TState, TAction>(): Store<TState, TAction> => {
   const context = React.useContext(PerfFormContext);
 
   return context;

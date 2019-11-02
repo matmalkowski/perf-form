@@ -5,9 +5,9 @@ import { Values } from '../types';
 import usePerfFormDispatch from './usePerformDispatch';
 import { validateForm } from '../store/actions';
 
-const usePerfFormField = <TValues extends Values>(name: keyof TValues) => {
+const useField = <TValues extends Values>(name: keyof TValues) => {
   const dispatch = usePerfFormDispatch<TValues>();
-  const isFirstEffect = React.useRef(true);
+  const isMounted = React.useRef(false);
   const { handleOnChange, handleOnBlur } = usePerfFormHandlers();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const value = usePerfFormSelector<TValues, any>(
@@ -33,24 +33,30 @@ const usePerfFormField = <TValues extends Values>(name: keyof TValues) => {
     state => state.validateOnBlur
   );
 
+  const isSubmitting = usePerfFormSelector<TValues, boolean>(
+    state => state.isSubmitting
+  );
+
   React.useEffect(() => {
     if (shouldValidateOnMount) {
       dispatch(validateForm());
     }
-    if (isFirstEffect.current === false) {
+    if (isMounted.current) {
       if (shouldValidateOnBlur || shouldValidateOnChange) {
         dispatch(validateForm(name));
       }
     }
 
-    isFirstEffect.current = false;
+
+    isMounted.current = true;
   },
   [
     value,
     touched,
     shouldValidateOnMount,
     shouldValidateOnChange,
-    shouldValidateOnBlur
+    shouldValidateOnBlur,
+    isSubmitting
   ]);
 
   return {
@@ -62,4 +68,4 @@ const usePerfFormField = <TValues extends Values>(name: keyof TValues) => {
   };
 };
 
-export default usePerfFormField;
+export default useField;

@@ -60,21 +60,44 @@ SetIsValidatingAction =>
 
 // -----------------------------------------------------------------------------
 
-
 export const validateForm = <TValues>(scopeField?: keyof TValues): ThunkAction<TValues, ThunkDecorator<TValues>> =>
   (dispatch, getState, { validation }) => {
     if (validation.validateForm) {
       const { values } = getState();
-      // dispatch(setIsValidating(true));
+      dispatch(setIsValidating(true));
       const results = validation.validateForm(values) || {} as Errors<TValues>;
-      console.debug('gonna validate those:', values);
-      console.debug('validation results', results);
+
       if (scopeField) {
         dispatch(setFieldError(scopeField, results[scopeField]));
       } else {
         dispatch(setErrors(results));
       }
 
-      // dispatch(setIsValidating(false));
+      dispatch(setIsValidating(false));
     }
+  };
+
+// -----------------------------------------------------------------------------
+
+export const SUBMIT_ATTEMPT = 'SUBMIT_ATTEMPT';
+export type SubmitAttemptAction = Action<typeof SUBMIT_ATTEMPT>
+export const submitAttempt = ():
+SubmitAttemptAction =>
+  ({ type: SUBMIT_ATTEMPT });
+
+// -----------------------------------------------------------------------------
+
+export const SUBMIT_FINISH = 'SUBMIT_FINISH';
+export type SubmitFinishAction = Action<typeof SUBMIT_FINISH>
+export const submitFinish = ():
+SubmitFinishAction =>
+  ({ type: SUBMIT_FINISH });
+
+// -----------------------------------------------------------------------------
+
+export const submitForm = <TValues>(): ThunkAction<TValues, ThunkDecorator<TValues>> =>
+  (dispatch, getState, { validation }) => {
+    dispatch(submitAttempt());
+
+    dispatch(submitFinish());
   };

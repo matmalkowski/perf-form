@@ -1,15 +1,15 @@
 import React from 'react';
-import { FormState, FormStore, Values } from '../types';
-import usePerfFormContext from './usePerfFormContext';
-import Observable from '../utils/Observable';
+import { FormState, Values } from '../types';
+import usePerfFormContext from './useFormContext';
+import { Actions } from '../store/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refEquality = (a: any, b: any) => a === b;
 
 const useSelectorWithStateAndObservable = <TValues extends Values, TSelected>(
   selector: (state: FormState<TValues>) => TSelected,
-  store: FormStore<TValues>,
-  observable: Observable
+  getState: () => FormState<TValues>,
+  subscribe: (listener: Function) => () => void
 ): TSelected => {
   const [, forceRender] = React.useReducer(s => s + 1, 0);
   const latestSelector = React.useRef<(s: FormState<TValues>) => TSelected
@@ -19,7 +19,7 @@ const useSelectorWithStateAndObservable = <TValues extends Values, TSelected>(
   let selectedState: TSelected;
 
   if (selector !== latestSelector.current) {
-    selectedState = selector(store.getState());
+    selectedState = selector(getState());
   } else {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     selectedState = latestSelectedState.current!;
@@ -32,18 +32,27 @@ const useSelectorWithStateAndObservable = <TValues extends Values, TSelected>(
 
   React.useLayoutEffect(() => {
     const checkUpdates = () => {
-      const newSelectedState = latestSelector.current && latestSelector.current(store.getState());
+      const state = getState();
+      const newSelectedState = latestSelector.current && latestSelector.current(state);
       if (refEquality(newSelectedState, latestSelectedState.current)) {
         return;
       }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const selectorName = latestSelector!.current!.toString().replace(/^[^{]*{\s*/, '').replace(/\s*}[^}]*$/, '');
+      console.groupCollapsed(`State :: [${selectorName}]`);
+      console.debug('prev-state:', latestSelectedState.current);
+      console.debug('next-state:', newSelectedState);
+      console.debug('global:', state);
+      console.groupEnd();
 
       latestSelectedState.current = newSelectedState;
+
       forceRender({});
     };
-    observable.subscribe(checkUpdates);
+    const unsubscribe = subscribe(checkUpdates);
     checkUpdates();
-    return () => observable.unsubscribe(checkUpdates);
-  }, [store, observable]);
+    return () => unsubscribe();
+  }, [getState, subscribe]);
   return selectedState;
 };
 
@@ -52,8 +61,8 @@ const createSelectorHook = () => {
   const usePerfFormSelector = <TValues extends Values, TSelected>(
     selector: (state: FormState<TValues>) => TSelected
   ): TSelected => {
-    const { store, observable } = usePerfFormContext<TValues>();
-    return useSelectorWithStateAndObservable(selector, store, observable);
+    const { getState, subscribe } = usePerfFormContext<FormState<TValues>, Actions<TValues>>();
+    return useSelectorWithStateAndObservable(selector, getState, subscribe);
   };
   return usePerfFormSelector;
 };

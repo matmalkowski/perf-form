@@ -9,9 +9,9 @@ FormState<TValues>,
 Actions<TValues>,
 ThunkDecorator<TValues>
 > => {
-  const { store } = React.useContext(PerfFormContext);
+  const { dispatch } = React.useContext(PerfFormContext);
 
-  return store.dispatch;
+  return dispatch;
 };
 
 export default usePerfFormDispatch;

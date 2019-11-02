@@ -1,6 +1,12 @@
 /* eslint-disable import/no-cycle */
 import {
-  SetFieldValueAction, SetFieldTouchedAction, SetErrorsAction, SetIsValidatingAction, SetFieldErrorAction
+  SetFieldValueAction,
+  SetFieldTouchedAction,
+  SetErrorsAction,
+  SetIsValidatingAction,
+  SetFieldErrorAction,
+  SubmitAttemptAction,
+  SubmitFinishAction
 } from './actions';
 
 import { FormState, Errors } from '../types';
@@ -26,4 +32,6 @@ export type Actions<TValues> =
   SetFieldTouchedAction<TValues> |
   SetFieldErrorAction<TValues> |
   SetErrorsAction<TValues> |
-  SetIsValidatingAction
+  SetIsValidatingAction |
+  SubmitAttemptAction |
+  SubmitFinishAction

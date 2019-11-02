@@ -3,9 +3,9 @@ import {
   Values, FormState, Errors
 } from '../types';
 import reducer from '../store/reducer';
-import useThunkReducer from '../store/useThunkReducer';
-import Provider from './Provider';
 import { Actions, ThunkDecorator } from '../store/types';
+import { PerfFormContext } from '../Context';
+import createStore from '../store/createStore';
 
 export type FormProps<TValues extends Values> = {
   initialValues: TValues;
@@ -16,13 +16,13 @@ export type FormProps<TValues extends Values> = {
 };
 
 type Props<T extends Values> = React.PropsWithChildren<FormProps<T>>;
-const Form = <TFormValues extends Values>(
+const PerfForm = <TFormValues extends Values>(
   props: Props<TFormValues>
 ) => {
   const {
     children, initialValues, validate, validateOnBlur, validateOnChange, validateOnMount
   } = props;
-  const [state, dispatch] = useThunkReducer<
+  const store = React.useRef(createStore<
   FormState<TFormValues>,
   Actions<TFormValues>,
   ThunkDecorator<TFormValues>
@@ -32,6 +32,7 @@ const Form = <TFormValues extends Values>(
       touched: {},
       errors: {},
       isValidating: false,
+      isSubmitting: false,
       validateOnBlur: !!validateOnBlur,
       validateOnChange: !!validateOnChange,
       validateOnMount: !!validateOnMount
@@ -40,20 +41,16 @@ const Form = <TFormValues extends Values>(
       validation: {
         validateForm: validate
       }
-    });
+    }));
 
-
-  return (
-    <Provider state={state} dispatch={dispatch}>
-      <form>{children}</form>
-    </Provider>
-  );
+  console.warn('<Form /> rendered!');
+  return (<PerfFormContext.Provider value={store.current}>{children}</PerfFormContext.Provider>);
 };
 
-Form.defaultProps = {
+PerfForm.defaultProps = {
   validateOnBlur: true,
   validateOnChange: true,
   validateOnMount: false
 };
 
-export default Form;
+export default PerfForm;
