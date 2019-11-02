@@ -1,5 +1,7 @@
 import React from 'react';
 import usePerfFormDispatch from './usePerformDispatch';
+import { setFieldValue, setFieldTouched } from '../store/actions';
+import { Values } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getField = (event: React.ChangeEvent<any> | React.FocusEvent<any>) => {
@@ -9,22 +11,22 @@ const getField = (event: React.ChangeEvent<any> | React.FocusEvent<any>) => {
   return { field, value };
 };
 
-const usePerfFormHandlers = () => {
-  const dispatch = usePerfFormDispatch();
+const usePerfFormHandlers = <TValues extends Values>() => {
+  const dispatch = usePerfFormDispatch<TValues>();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOnChange = React.useCallback((event: React.ChangeEvent<any>) => {
     const { field, value } = getField(event);
     if (field) {
-      dispatch({ type: 'FIELD_VALUE_CHANGE', payload: { field, value } });
+      dispatch(setFieldValue<TValues>(field, value));
     }
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleOnBlur = React.useCallback((event: React.FocusEvent<any>) => {
-    const { field, value } = getField(event);
+    const { field } = getField(event);
     if (field) {
-      dispatch({ type: 'FIELD_VALUE_CHANGE', payload: { field, value } });
+      dispatch(setFieldTouched<TValues>(field, true));
     }
   }, []);
 

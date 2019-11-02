@@ -1,7 +1,9 @@
 import React from 'react';
-import { FormState, Values, Action } from '../types';
+import { FormState, Values } from '../types';
 import { PerfFormContext } from '../Context';
 import Observable from '../utils/Observable';
+import { ThunkDispatch, Actions, ThunkDecorator } from '../store/types';
+
 
 const usePrevious = <T extends {}>(value: T) => {
   const ref = React.useRef<T>();
@@ -13,13 +15,15 @@ const usePrevious = <T extends {}>(value: T) => {
 
 type ProviderProps<TValues extends Values> = {
   state: FormState<TValues>,
-  dispatch: React.Dispatch<Action<TValues>>
+  dispatch: ThunkDispatch<FormState<TValues>, Actions<TValues>, ThunkDecorator<TValues>>
 }
 
 type Props<T extends Values> = React.PropsWithChildren<ProviderProps<T>>;
 
 const Provider = <TFormValues extends Values>(props: Props<TFormValues>) => {
-  const { state, dispatch, children } = props;
+  const {
+    state, dispatch, children
+  } = props;
   const refObservable = React.useRef(new Observable());
 
   const getState = () => state;
@@ -36,6 +40,7 @@ const Provider = <TFormValues extends Values>(props: Props<TFormValues>) => {
   React.useEffect(() => {
     const { observable } = contextValue;
     if (previousState !== getState()) {
+      console.log('new store ', getState());
       // Not the cleanest way, but don't wanna change the memonized reference, so we don't trigger the Context refresh
       contextValue.store.getState = getState;
       observable.notify();

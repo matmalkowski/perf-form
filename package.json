@@ -18,7 +18,7 @@
     "build": "rollup -c && yarn emit-declarations",
     "watch": "rollup -c -w --dev",
     "typecheck": "tsc",
-    "emit-declarations:watch": "yarn emit-declarations --watch",
+    "tsc:watch": "yarn emit-declarations --watch",
     "emit-declarations": "tsc -p tsconfig.json -d --noEmit false --emitDeclarationOnly --isolatedModules false --declarationDir \"./lib/\""
   },
   "peerDependencies": {

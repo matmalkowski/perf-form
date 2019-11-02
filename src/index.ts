@@ -4,3 +4,4 @@ export { default as Form } from './components/Form';
 
 export { default as usePerfFormHandlers } from './hooks/usePerfFormHandlers';
 export { usePerfFormSelector } from './hooks/usePerfFormSelector';
+export { default as usePerfFormField } from './hooks/usePerfFormField';
