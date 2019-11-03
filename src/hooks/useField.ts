@@ -13,13 +13,6 @@ const useField = <TValues extends Values>(name: keyof TValues) => {
   const value = usePerfFormSelector<TValues, any>(
     state => state.values[name]
   );
-  const touched = usePerfFormSelector<TValues, boolean>(
-    state => !!state.touched[name]
-  );
-
-  const errors = usePerfFormSelector<TValues, string | undefined>(
-    state => state.errors[name]
-  );
 
   const shouldValidateOnMount = usePerfFormSelector<TValues, boolean>(
     state => state.validateOnMount
@@ -37,8 +30,6 @@ const useField = <TValues extends Values>(name: keyof TValues) => {
 
   return {
     value,
-    touched,
-    errors,
     handleOnChange,
     handleOnBlur
   };
