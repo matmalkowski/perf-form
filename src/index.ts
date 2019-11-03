@@ -8,5 +8,4 @@ export { default as useFormHandlers } from './hooks/useFormHandlers';
 export { default as useField } from './hooks/useField';
 export { default as useFieldStatus } from './hooks/useFieldStatus';
 
-export { default as usePerfFormHandlers } from './hooks/usePerfFormHandlers';
 export { usePerfFormSelector } from './hooks/usePerfFormSelector';

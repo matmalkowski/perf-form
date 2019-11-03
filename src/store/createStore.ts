@@ -2,8 +2,12 @@ import React from 'react';
 // eslint-disable-next-line import/no-cycle
 import { Actions } from './actions';
 import { FormState } from './state';
-import { ValidateHandler } from '../types';
+import { FieldValidateHandler, ValidateHandler } from '../types';
 import debug from '../utils/debug';
+
+type FieldValidators<TValues> = {
+  [P in keyof TValues]?: FieldValidateHandler;
+};
 
 export type ThunkDecorator<TValues> = {
   validation: {
@@ -25,6 +29,7 @@ export type Store<TValues> = {
   getState: () => FormState<TValues>
   dispatch: Dispatch<TValues>;
   subscribe: (listener: Function) => () => void;
+  registerField: (name: keyof TValues, validate: FieldValidateHandler) => () => void;
 }
 
 
@@ -34,6 +39,7 @@ const createStore = <TValues>(
   decorator: ThunkDecorator<TValues>
 ): Store<TValues> => {
   let subscribers: Array<Function> = [];
+  const fieldsValidators: FieldValidators<TValues> = {};
   let state = reducer(initialState as FormState<TValues>, { type: '__INIT__' } as unknown as Actions<TValues>);
 
   const getState = () => state;
@@ -55,6 +61,12 @@ const createStore = <TValues>(
       subscribers.push(listener);
       return () => {
         subscribers = subscribers.filter(s => s !== listener);
+      };
+    },
+    registerField: (name: keyof TValues, validate: FieldValidateHandler) => {
+      fieldsValidators[name] = validate;
+      return () => {
+        delete fieldsValidators[name];
       };
     },
     getState,

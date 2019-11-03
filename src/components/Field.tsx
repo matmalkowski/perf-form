@@ -1,6 +1,7 @@
 import React, { HTMLProps } from 'react';
 import useField from '../hooks/useField';
 import debug from '../utils/debug';
+import { FieldValidateHandler } from '../types';
 
 type AsElement<T> =
   T extends 'input' ? HTMLProps<HTMLInputElement> :
@@ -12,16 +13,18 @@ type OwnProps<T extends 'input' | 'select' | 'textarea'> = {
   as?: T,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   innerRef?: (instance: any) => void;
+  validate?: FieldValidateHandler
 }
 
 type Props<T extends 'input' | 'select' | 'textarea'> = OwnProps<T> & AsElement<T>
 
 const Input = <T extends 'input' | 'select' | 'textarea' = 'input'>(props: Props<T>) => {
   const {
-    name, as: component, innerRef, ...rest
+    name, as: component, innerRef, validate, ...rest
   } = props;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const { value, handleOnChange, handleOnBlur } = useField(name!);
+  const { value, handleOnChange, handleOnBlur } = useField(name!, validate!);
+
   const asElement = component || 'input';
   if (__DEV__) {
     debug('<Input />', 'rendered!', { value, ...rest });
