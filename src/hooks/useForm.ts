@@ -1,8 +1,8 @@
 import React from 'react';
 import { usePerfFormSelector } from './usePerfFormSelector';
-import { Values } from '../types';
 import usePerfFormDispatch from './usePerformDispatch';
 import { submitForm } from '../store/actions';
+import { Values } from '../store/state';
 
 const useForm = <TValues extends Values>() => {
   const dispatch = usePerfFormDispatch<TValues>();

@@ -3,12 +3,12 @@ export type Values = {
   [field: string]: any;
 };
 
-export type Errors<Values> = {
-  [P in keyof Values]?: string;
+export type Errors<TValues extends Values> = {
+  [P in keyof TValues]?: string;
 };
 
-export type Touched<Values> = {
-  [P in keyof Values]?: boolean;
+export type Touched<TValues extends Values> = {
+  [P in keyof TValues]?: boolean;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

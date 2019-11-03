@@ -1,7 +1,7 @@
 import React from 'react';
 import usePerfFormDispatch from './usePerformDispatch';
 import { setFieldValue, setFieldTouched } from '../store/actions';
-import { Values } from '../types';
+import { Values } from '../store/state';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getField = (event: React.ChangeEvent<any> | React.FocusEvent<any>) => {

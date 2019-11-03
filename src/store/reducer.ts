@@ -1,5 +1,3 @@
-import { FormState, Values } from '../types';
-import { Actions } from './types';
 import {
   SET_FIELD_VALUE,
   SET_FIELD_TOUCHED,
@@ -7,8 +5,10 @@ import {
   SET_FIELD_ERROR,
   SET_IS_VALIDATING,
   SUBMIT_ATTEMPT,
-  SUBMIT_FINISH
+  SUBMIT_FINISH,
+  Actions
 } from './actions';
+import { Values, FormState } from './state';
 
 const reducer = <TValues extends Values>(
   state: FormState<TValues>,

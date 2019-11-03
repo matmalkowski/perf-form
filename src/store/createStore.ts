@@ -1,29 +1,49 @@
 import React from 'react';
-import { Thunk } from './types';
+import { Actions } from './actions';
+import { Errors, FormState } from './state';
 
-export type Store<TState, TAction> = {
-  getState: () => TState
-  dispatch: (action: TAction) => void;
+export type ThunkDecorator<TValues> = {
+  validation: {
+    validateForm?: (values: TValues) => Errors<TValues> | undefined;
+  }
+}
+
+export type Thunk<TValues> = (
+  dispatch: Dispatch<TValues>,
+  getState: () => FormState<TValues>,
+  decorator: ThunkDecorator<TValues>
+) => Promise<void>;
+
+export type Dispatch<TValues> = (action: Actions<TValues> | Thunk<TValues>) =>
+Promise<void>
+
+
+export type Store<TValues> = {
+  getState: () => FormState<TValues>
+  dispatch: Dispatch<TValues>;
   subscribe: (listener: Function) => () => void;
 }
 
-const createStore = <TState, TAction, TDecorator>(
-  reducer: React.Reducer<TState, TAction>,
-  initialState: TState,
-  decorator: TDecorator
-): Store<TState, TAction> => {
+
+const createStore = <TValues>(
+  reducer: React.Reducer<FormState<TValues>, Actions<TValues>>,
+  initialState: FormState<TValues>,
+  decorator: ThunkDecorator<TValues>
+): Store<TValues> => {
   let subscribers: Array<Function> = [];
-  let state = reducer(initialState as TState, { type: '__INIT__' } as unknown as TAction);
+  let state = reducer(initialState as FormState<TValues>, { type: '__INIT__' } as unknown as Actions<TValues>);
 
   const getState = () => state;
-  const dispatch = (action: TAction | Thunk<TState, TAction, TDecorator>) => {
-    if (action instanceof Function) {
-      action(dispatch, getState, decorator);
-    } else {
-      state = reducer(state, action);
-      subscribers.forEach(s => s(state));
-    }
-  };
+  const dispatch = (action: Actions<TValues> | Thunk<TValues>): Promise<void> =>
+    new Promise((resolve) => {
+      if (action instanceof Function) {
+        action(dispatch, getState, decorator).finally(resolve);
+      } else {
+        state = reducer(state, action);
+        resolve();
+        subscribers.forEach(s => s(state));
+      }
+    });
 
   return {
     subscribe: (listener: Function) => {

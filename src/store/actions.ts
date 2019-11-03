@@ -1,6 +1,6 @@
-/* eslint-disable import/no-cycle */
-import { Errors } from '../types';
-import { ThunkAction, ThunkDecorator } from './types';
+// eslint-disable-next-line import/no-cycle
+import { Thunk } from './createStore';
+import { Errors } from './state';
 
 type Action<T> = {
   type: T,
@@ -60,21 +60,20 @@ SetIsValidatingAction =>
 
 // -----------------------------------------------------------------------------
 
-export const validateForm = <TValues>(scopeField?: keyof TValues): ThunkAction<TValues, ThunkDecorator<TValues>> =>
+export const validateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
   (dispatch, getState, { validation }) => {
     if (validation.validateForm) {
       const { values } = getState();
-      dispatch(setIsValidating(true));
-      const results = validation.validateForm(values) || {} as Errors<TValues>;
-
-      if (scopeField) {
-        dispatch(setFieldError(scopeField, results[scopeField]));
-      } else {
-        dispatch(setErrors(results));
-      }
-
-      dispatch(setIsValidating(false));
+      dispatch(setIsValidating(true)).then(() => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const results = validation.validateForm!(values) || {} as Errors<TValues>;
+        const dispatchedErrors = scopeField
+          ? dispatch(setFieldError(scopeField, results[scopeField]))
+          : dispatch(setErrors(results));
+        dispatchedErrors.then(() => dispatch(setIsValidating(false)));
+      });
     }
+    return Promise.resolve();
   };
 
 // -----------------------------------------------------------------------------
@@ -95,9 +94,19 @@ SubmitFinishAction =>
 
 // -----------------------------------------------------------------------------
 
-export const submitForm = <TValues>(): ThunkAction<TValues, ThunkDecorator<TValues>> =>
-  (dispatch, getState, { validation }) => {
+export const submitForm = <TValues>(): Thunk<TValues> =>
+  (dispatch, _) => {
     dispatch(submitAttempt());
 
-    dispatch(submitFinish());
+    return dispatch(submitFinish());
   };
+
+
+export type Actions<TValues> =
+  SetFieldValueAction<TValues> |
+  SetFieldTouchedAction<TValues> |
+  SetFieldErrorAction<TValues> |
+  SetErrorsAction<TValues> |
+  SetIsValidatingAction |
+  SubmitAttemptAction |
+  SubmitFinishAction

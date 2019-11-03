@@ -1,14 +1,9 @@
 import React from 'react';
-import { FormState } from '../types';
 import { PerfFormContext } from '../Context';
-import { ThunkDispatch, Actions, ThunkDecorator } from '../store/types';
+import { Dispatch } from '../store/createStore';
 
 
-const usePerfFormDispatch = <TValues>(): ThunkDispatch<
-FormState<TValues>,
-Actions<TValues>,
-ThunkDecorator<TValues>
-> => {
+const usePerfFormDispatch = <TValues>(): Dispatch<TValues> => {
   const { dispatch } = React.useContext(PerfFormContext);
 
   return dispatch;

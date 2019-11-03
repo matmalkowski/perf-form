@@ -1,7 +1,6 @@
 import React from 'react';
-import { FormState, Values } from '../types';
 import usePerfFormContext from './useFormContext';
-import { Actions } from '../store/types';
+import { FormState, Values } from '../store/state';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refEquality = (a: any, b: any) => a === b;
@@ -61,7 +60,7 @@ const createSelectorHook = () => {
   const usePerfFormSelector = <TValues extends Values, TSelected>(
     selector: (state: FormState<TValues>) => TSelected
   ): TSelected => {
-    const { getState, subscribe } = usePerfFormContext<FormState<TValues>, Actions<TValues>>();
+    const { getState, subscribe } = usePerfFormContext<TValues>();
     return useSelectorWithStateAndObservable(selector, getState, subscribe);
   };
   return usePerfFormSelector;

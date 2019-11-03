@@ -1,9 +1,9 @@
 import React from 'react';
 import usePerfFormHandlers from './usePerfFormHandlers';
 import { usePerfFormSelector } from './usePerfFormSelector';
-import { Values } from '../types';
 import usePerfFormDispatch from './usePerformDispatch';
 import { validateForm } from '../store/actions';
+import { Values } from '../store/state';
 
 const useField = <TValues extends Values>(name: keyof TValues) => {
   const dispatch = usePerfFormDispatch<TValues>();

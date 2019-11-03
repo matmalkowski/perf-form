@@ -1,11 +1,9 @@
 import React from 'react';
-import {
-  Values, FormState, Errors
-} from '../types';
+
 import reducer from '../store/reducer';
-import { Actions, ThunkDecorator } from '../store/types';
 import { PerfFormContext } from '../Context';
 import createStore from '../store/createStore';
+import { Values, Errors } from '../store/state';
 
 export type FormProps<TValues extends Values> = {
   initialValues: TValues;
@@ -22,11 +20,7 @@ const PerfForm = <TFormValues extends Values>(
   const {
     children, initialValues, validate, validateOnBlur, validateOnChange, validateOnMount
   } = props;
-  const store = React.useRef(createStore<
-  FormState<TFormValues>,
-  Actions<TFormValues>,
-  ThunkDecorator<TFormValues>
-  >(reducer,
+  const store = React.useRef(createStore<TFormValues>(reducer,
     {
       values: initialValues,
       touched: {},

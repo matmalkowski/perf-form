@@ -1,5 +1,3 @@
-export * from './types';
-
 export { default as PerfForm } from './components/PerfForm';
 export { default as useField } from './hooks/useField';
 export { default as useForm } from './hooks/useForm';
