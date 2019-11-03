@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-cycle
 import { Thunk } from './createStore';
 import { Errors } from './state';
+import runValidateHandler from '../validation/runValidateHandler';
 
 type Action<T> = {
   type: T,
@@ -62,18 +63,44 @@ SetIsValidatingAction =>
 
 export const validateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
   (dispatch, getState, { validation }) => {
-    if (validation.validateForm) {
-      const { values } = getState();
-      dispatch(setIsValidating(true)).then(() => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const results = validation.validateForm!(values) || {} as Errors<TValues>;
+    const { values } = getState();
+    console.log('validateForm');
+    return dispatch(setIsValidating(true)).then(() => {
+      runValidateHandler(values, validation.validateForm).then((validationErrors => {
         const dispatchedErrors = scopeField
-          ? dispatch(setFieldError(scopeField, results[scopeField]))
-          : dispatch(setErrors(results));
+          ? dispatch(setFieldError(scopeField, validationErrors[scopeField]))
+          : dispatch(setErrors(validationErrors));
         dispatchedErrors.then(() => dispatch(setIsValidating(false)));
-      });
-    }
-    return Promise.resolve();
+      }));
+    });
+  };
+
+// -----------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const executeChange = <TValues>(field: keyof TValues, value?: any): Thunk<TValues> =>
+  (dispatch, getState) => {
+    const { validateOnChange } = getState();
+
+    return dispatch(setFieldValue(field, value)).then(() => {
+      if (validateOnChange) {
+        return dispatch(validateForm(field));
+      } return Promise.resolve();
+    });
+  };
+
+// -----------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const executeBlur = <TValues>(field: keyof TValues): Thunk<TValues> =>
+  (dispatch, getState) => {
+    const { validateOnBlur } = getState();
+
+    return dispatch(setFieldTouched(field, true)).then(() => {
+      if (validateOnBlur) {
+        return dispatch(validateForm(field));
+      } return Promise.resolve();
+    });
   };
 
 // -----------------------------------------------------------------------------
@@ -95,11 +122,10 @@ SubmitFinishAction =>
 // -----------------------------------------------------------------------------
 
 export const submitForm = <TValues>(): Thunk<TValues> =>
-  (dispatch, _) => {
-    dispatch(submitAttempt());
-
-    return dispatch(submitFinish());
-  };
+  (dispatch, _) =>
+    dispatch(submitAttempt())
+      .then(() => dispatch(validateForm()))
+      .then(() => dispatch(submitFinish()));
 
 
 export type Actions<TValues> =

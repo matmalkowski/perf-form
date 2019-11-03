@@ -25,38 +25,14 @@ const useField = <TValues extends Values>(name: keyof TValues) => {
     state => state.validateOnMount
   );
 
-  const shouldValidateOnChange = usePerfFormSelector<TValues, boolean>(
-    state => state.validateOnChange
-  );
-
-  const shouldValidateOnBlur = usePerfFormSelector<TValues, boolean>(
-    state => state.validateOnBlur
-  );
-
-  const isSubmitting = usePerfFormSelector<TValues, boolean>(
-    state => state.isSubmitting
-  );
-
   React.useEffect(() => {
-    if (shouldValidateOnMount) {
-      dispatch(validateForm());
+    if (isMounted.current === false && shouldValidateOnMount) {
+      dispatch(validateForm(name));
     }
-    if (isMounted.current) {
-      if (shouldValidateOnBlur || shouldValidateOnChange) {
-        dispatch(validateForm(name));
-      }
-    }
-
-
     isMounted.current = true;
   },
   [
-    value,
-    touched,
-    shouldValidateOnMount,
-    shouldValidateOnChange,
-    shouldValidateOnBlur,
-    isSubmitting
+    shouldValidateOnMount
   ]);
 
   return {

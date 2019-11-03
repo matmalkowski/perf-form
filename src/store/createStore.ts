@@ -1,10 +1,12 @@
 import React from 'react';
+// eslint-disable-next-line import/no-cycle
 import { Actions } from './actions';
-import { Errors, FormState } from './state';
+import { FormState } from './state';
+import { ValidateHandler } from '../types';
 
 export type ThunkDecorator<TValues> = {
   validation: {
-    validateForm?: (values: TValues) => Errors<TValues> | undefined;
+    validateForm?: ValidateHandler<TValues>;
   }
 }
 
@@ -34,16 +36,15 @@ const createStore = <TValues>(
   let state = reducer(initialState as FormState<TValues>, { type: '__INIT__' } as unknown as Actions<TValues>);
 
   const getState = () => state;
-  const dispatch = (action: Actions<TValues> | Thunk<TValues>): Promise<void> =>
-    new Promise((resolve) => {
-      if (action instanceof Function) {
-        action(dispatch, getState, decorator).finally(resolve);
-      } else {
-        state = reducer(state, action);
-        resolve();
-        subscribers.forEach(s => s(state));
-      }
-    });
+  const dispatch = (action: Actions<TValues> | Thunk<TValues>): Promise<void> => {
+    if (action instanceof Function) {
+      return action(dispatch, getState, decorator);
+    }
+    state = reducer(state, action);
+
+    subscribers.forEach(s => s(state));
+    return Promise.resolve();
+  };
 
   return {
     subscribe: (listener: Function) => {
