@@ -3,6 +3,7 @@ import React from 'react';
 import { Actions } from './actions';
 import { FormState } from './state';
 import { ValidateHandler } from '../types';
+import debug from '../utils/debug';
 
 export type ThunkDecorator<TValues> = {
   validation: {
@@ -40,8 +41,11 @@ const createStore = <TValues>(
     if (action instanceof Function) {
       return action(dispatch, getState, decorator);
     }
+    if (__DEV__) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      debug('Action', action.type, (action as any).payload);
+    }
     state = reducer(state, action);
-
     subscribers.forEach(s => s(state));
     return Promise.resolve();
   };

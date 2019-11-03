@@ -38,7 +38,6 @@ const PerfForm = <TFormValues extends Values>(
       }
     }));
 
-  console.warn('<Form /> rendered!');
   return (<PerfFormContext.Provider value={store.current}>{children}</PerfFormContext.Provider>);
 };
 

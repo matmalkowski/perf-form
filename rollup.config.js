@@ -2,6 +2,7 @@ import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import replace from "rollup-plugin-replace";
+import sourceMaps from 'rollup-plugin-sourcemaps'
 
 import { terser } from 'rollup-plugin-terser';
 import path from 'path';
@@ -14,7 +15,7 @@ const external = [...Object.keys(pkg.peerDependencies || {})];
 
 const plugins = (dev) => ([
   replace({
-    "process.env.NODE_ENV": JSON.stringify(dev ? "development" : "production"),
+    "__DEV__": JSON.stringify(dev),
   }),
   commonjs(),
   // Allows node_modules resolution
@@ -22,8 +23,30 @@ const plugins = (dev) => ([
 
   // Compile TypeScript/JavaScript files
   babel({ configFile: './babel.config.js', extensions, include: ['src/**/*'] }),
-  dev ? null : terser(),
+  sourceMaps(),
+  dev ? null : terser({
+    sourcemap: true,
+    output: { comments: false },
+    compress: {
+      keep_infinity: true,
+      pure_getters: true,
+      passes: 10,
+    },
+    ecma: 5,
+    warnings: true,
+  }),
 ]);
+
+const outputCommon = {
+  sourcemap: true,
+  globals: { react: 'React' },
+  exports: 'named',
+  freeze: false,
+  esModule: false,
+  treeshake: {
+    propertyReadSideEffects: false,
+  },
+}
 
 export default CLIArgs => {
   const dev = !!CLIArgs.dev;
@@ -35,18 +58,18 @@ export default CLIArgs => {
       {
         file: pkg.module,
         format: 'esm',
-        sourcemap: true,
+        ...outputCommon
       },
       {
         file: pkg.main,
         format: 'cjs',
-        sourcemap: true,
+        ...outputCommon
       },
       {
         file: pkg.browser,
         format: 'umd',
         name: 'perfForm',
-        sourcemap: true,
+        ...outputCommon
       }
     ]
   }]

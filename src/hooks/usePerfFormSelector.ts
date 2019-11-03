@@ -1,6 +1,7 @@
 import React from 'react';
 import usePerfFormContext from './useFormContext';
 import { FormState, Values } from '../store/state';
+import debug from '../utils/debug';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refEquality = (a: any, b: any) => a === b;
@@ -36,13 +37,15 @@ const useSelectorWithStateAndObservable = <TValues extends Values, TSelected>(
       if (refEquality(newSelectedState, latestSelectedState.current)) {
         return;
       }
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const selectorName = latestSelector!.current!.toString().replace(/^[^{]*{\s*/, '').replace(/\s*}[^}]*$/, '');
-      console.groupCollapsed(`State :: [${selectorName}]`);
-      console.debug('prev-state:', latestSelectedState.current);
-      console.debug('next-state:', newSelectedState);
-      console.debug('global:', state);
-      console.groupEnd();
+      if (__DEV__) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const selectorName = latestSelector!.current!
+          .toString()
+          .replace(/^[^{]*{\s*/, '').replace(/\s*}[^}]*$/, '')
+          .replace('return state.', '')
+          .replace(';', '');
+        debug('Selector', selectorName, { prev: latestSelectedState.current, next: newSelectedState });
+      }
 
       latestSelectedState.current = newSelectedState;
 

@@ -1,3 +1,4 @@
+import warning from 'tiny-warning';
 import { ValidateHandler, ValidationResults } from '../types';
 import { isPromise } from '../utils/utils';
 
@@ -15,12 +16,7 @@ ValidationHandlerResults<TValues> => new Promise((resolve, reject) => {
           resolve(errors || {});
         },
         exception => {
-          if (process.env.NODE_ENV !== 'production') {
-            console.warn(
-              'Warning: An unhandled error was caught during execution of form level validate()',
-              exception
-            );
-          }
+          warning(false, `An unhandled error was caught during validation: ${exception}`);
 
           reject(exception);
         }

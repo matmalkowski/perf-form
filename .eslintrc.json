@@ -23,5 +23,8 @@
     "arrow-parens": "off",
     "import/no-unresolved": "off",
     "no-console": "warn"
+  },
+  "globals": {
+    "__DEV__": "readonly"
   }
 }

@@ -64,7 +64,6 @@ SetIsValidatingAction =>
 export const validateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
   (dispatch, getState, { validation }) => {
     const { values } = getState();
-    console.log('validateForm');
     return dispatch(setIsValidating(true)).then(() => {
       runValidateHandler(values, validation.validateForm).then((validationErrors => {
         const dispatchedErrors = scopeField

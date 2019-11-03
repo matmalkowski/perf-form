@@ -14,9 +14,6 @@ const reducer = <TValues extends Values>(
   state: FormState<TValues>,
   action: Actions<TValues>
 ): FormState<TValues> => {
-  console.groupCollapsed(`Action :: [${action.type}]`);
-  console.debug('payload:', (action as any).payload);
-  console.groupEnd();
   switch (action.type) {
     case SET_FIELD_VALUE:
       return {
