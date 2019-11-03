@@ -9,16 +9,22 @@ type FieldValidators<TValues> = {
   [P in keyof TValues]?: FieldValidateHandler;
 };
 
-export type ThunkDecorator<TValues> = {
+type Decorator<TValues> = {
   validation: {
     validateForm?: ValidateHandler<TValues>;
   }
 }
 
+type DispatchDecorator<TValues> = {
+  validation: {
+    validateField: FieldValidators<TValues>;
+  }
+} & Decorator<TValues>
+
 export type Thunk<TValues> = (
   dispatch: Dispatch<TValues>,
   getState: () => FormState<TValues>,
-  decorator: ThunkDecorator<TValues>
+  decorator: DispatchDecorator<TValues>
 ) => Promise<void>;
 
 export type Dispatch<TValues> = (action: Actions<TValues> | Thunk<TValues>) =>
@@ -36,7 +42,7 @@ export type Store<TValues> = {
 const createStore = <TValues>(
   reducer: React.Reducer<FormState<TValues>, Actions<TValues>>,
   initialState: FormState<TValues>,
-  decorator: ThunkDecorator<TValues>
+  decorator: Decorator<TValues>
 ): Store<TValues> => {
   let subscribers: Array<Function> = [];
   const fieldsValidators: FieldValidators<TValues> = {};
@@ -45,7 +51,17 @@ const createStore = <TValues>(
   const getState = () => state;
   const dispatch = (action: Actions<TValues> | Thunk<TValues>): Promise<void> => {
     if (action instanceof Function) {
-      return action(dispatch, getState, decorator);
+      return action(
+        dispatch,
+        getState,
+        {
+          ...decorator,
+          validation: {
+            ...decorator.validation,
+            validateField: fieldsValidators
+          }
+        }
+      );
     }
     if (__DEV__) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

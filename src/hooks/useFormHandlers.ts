@@ -1,10 +1,10 @@
 import React from 'react';
-import usePerfFormDispatch from './usePerformDispatch';
 import { submitForm } from '../store/actions';
 import { Values } from '../store/state';
+import usePerfFormContext from './useFormContext';
 
 const useFormHandlers = <TValues extends Values>() => {
-  const dispatch = usePerfFormDispatch<TValues>();
+  const { dispatch } = usePerfFormContext<TValues>();
 
   const handleSubmit = (event: React.FormEvent) => {
     if (event.persist) event.persist();
@@ -13,8 +13,6 @@ const useFormHandlers = <TValues extends Values>() => {
   };
 
   return {
-    // isSubmitting,
-    // isValidating,
     handleSubmit
   };
 };

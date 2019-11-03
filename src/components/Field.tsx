@@ -18,7 +18,7 @@ type OwnProps<T extends 'input' | 'select' | 'textarea'> = {
 
 type Props<T extends 'input' | 'select' | 'textarea'> = OwnProps<T> & AsElement<T>
 
-const Input = <T extends 'input' | 'select' | 'textarea' = 'input'>(props: Props<T>) => {
+const Field = <T extends 'input' | 'select' | 'textarea' = 'input'>(props: Props<T>) => {
   const {
     name, as: component, innerRef, validate, ...rest
   } = props;
@@ -27,7 +27,7 @@ const Input = <T extends 'input' | 'select' | 'textarea' = 'input'>(props: Props
 
   const asElement = component || 'input';
   if (__DEV__) {
-    debug('<Input />', 'rendered!', { value, ...rest });
+    debug(`Field[${name}]`, 'rendered!', { value, ...rest });
   }
   return React.createElement(
     asElement,
@@ -42,4 +42,4 @@ const Input = <T extends 'input' | 'select' | 'textarea' = 'input'>(props: Props
   );
 };
 
-export default Input;
+export default Field;
