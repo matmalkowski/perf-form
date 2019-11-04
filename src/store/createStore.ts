@@ -2,16 +2,16 @@ import React from 'react';
 // eslint-disable-next-line import/no-cycle
 import { Actions } from './actions';
 import { FormState } from './state';
-import { FieldValidateHandler, ValidateHandler } from '../types';
+import { FieldValidationHandler, ValidationHandler } from '../types';
 import debug from '../utils/debug';
 
 type FieldValidators<TValues> = {
-  [P in keyof TValues]?: FieldValidateHandler;
+  [P in keyof TValues]?: FieldValidationHandler;
 };
 
 type Decorator<TValues> = {
   validation: {
-    validateForm?: ValidateHandler<TValues>;
+    validateForm?: ValidationHandler<TValues>;
   }
 }
 
@@ -21,21 +21,21 @@ type DispatchDecorator<TValues> = {
   }
 } & Decorator<TValues>
 
-export type Thunk<TValues> = (
+export type Thunk<TValues, TReturn = void> = (
   dispatch: Dispatch<TValues>,
   getState: () => FormState<TValues>,
   decorator: DispatchDecorator<TValues>
-) => Promise<void>;
+) => Promise<TReturn>;
 
-export type Dispatch<TValues> = (action: Actions<TValues> | Thunk<TValues>) =>
-Promise<void>
+export type Dispatch<TValues, TReturn = void> = (action: Actions<TValues> | Thunk<TValues>) =>
+Promise<TReturn>
 
 
 export type Store<TValues> = {
   getState: () => FormState<TValues>
   dispatch: Dispatch<TValues>;
   subscribe: (listener: Function) => () => void;
-  registerField: (name: keyof TValues, validate: FieldValidateHandler) => () => void;
+  registerField: (name: keyof TValues, validate: FieldValidationHandler) => () => void;
 }
 
 
@@ -79,7 +79,7 @@ const createStore = <TValues>(
         subscribers = subscribers.filter(s => s !== listener);
       };
     },
-    registerField: (name: keyof TValues, validate: FieldValidateHandler) => {
+    registerField: (name: keyof TValues, validate: FieldValidationHandler) => {
       fieldsValidators[name] = validate;
       return () => {
         delete fieldsValidators[name];

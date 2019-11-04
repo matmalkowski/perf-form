@@ -1,7 +1,8 @@
 // eslint-disable-next-line import/no-cycle
+import { isFunction } from 'util';
 import { Thunk } from './createStore';
 import { Errors } from './state';
-import runValidateHandler from '../validation/runValidateHandler';
+import { runFieldValidationHandler, runValidationHandler } from '../validation/runValidateHandler';
 
 type Action<T> = {
   type: T,
@@ -61,11 +62,39 @@ SetIsValidatingAction =>
 
 // -----------------------------------------------------------------------------
 
+export const runSingleFieldValidator = <TValues>(
+  field: keyof TValues,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value: any):
+Thunk<TValues, string | undefined> =>
+  (_d, _s, { validation }) => {
+    const validate = validation.validateField[field];
+    return runFieldValidationHandler(value, validate);
+  };
+
+export const runAllFieldValidators = <TValues>(
+  values: TValues):
+Thunk<TValues, Errors<TValues>> =>
+  (_d, _s, { validation }) => {
+    const fieldsToValidate = Object.keys(validation.validateField)
+      .filter(f => isFunction(validation.validateField[f as keyof TValues]));
+
+    const validationResults = fieldsToValidate
+      .map(field => runSingleFieldValidator(field, values[field as keyof TValues]));
+
+    return Promise.all(validationResults).then(fieldError);
+    const validate = validation.validateField[field];
+    return runFieldValidationHandler(value, validate);
+  };
+
+// -----------------------------------------------------------------------------
+
+
 export const validateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
   (dispatch, getState, { validation }) => {
     const { values } = getState();
     return dispatch(setIsValidating(true)).then(() => {
-      runValidateHandler(values, validation.validateForm).then((validationErrors => {
+      runValidationHandler(values, validation.validateForm).then((validationErrors => {
         const dispatchedErrors = scopeField
           ? dispatch(setFieldError(scopeField, validationErrors[scopeField]))
           : dispatch(setErrors(validationErrors));
