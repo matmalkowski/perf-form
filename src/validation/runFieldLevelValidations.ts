@@ -1,4 +1,4 @@
-import { isFunction } from 'util';
+import { isFunction } from '../utils/utils';
 import runFieldValidationHandler from './runFieldValidationHandler';
 import { FieldValidators } from '../store/types';
 
