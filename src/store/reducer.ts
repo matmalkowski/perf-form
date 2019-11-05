@@ -8,7 +8,7 @@ import {
   SUBMIT_FINISH,
   Actions
 } from './actions';
-import { Values, FormState } from './state';
+import { Values, FormState } from './types';
 
 const reducer = <TValues extends Values>(
   state: FormState<TValues>,

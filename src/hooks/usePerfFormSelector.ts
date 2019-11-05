@@ -1,7 +1,7 @@
 import React from 'react';
 import usePerfFormContext from './useFormContext';
-import { FormState, Values } from '../store/state';
 import debug from '../utils/debug';
+import { FormState, Values } from '../store/types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const refEquality = (a: any, b: any) => a === b;

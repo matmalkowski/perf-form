@@ -2,9 +2,9 @@ import React from 'react';
 import warning from 'tiny-warning';
 import { usePerfFormSelector } from './usePerfFormSelector';
 import { validateForm, executeChange, executeBlur } from '../store/actions';
-import { Values } from '../store/state';
 import usePerfFormContext from './useFormContext';
-import { FieldValidateHandler } from '../types';
+import { Values } from '../store/types';
+import { FieldValidationHandler } from '../types';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getField = (event: React.ChangeEvent<any> | React.FocusEvent<any>, handlerName: string) => {
@@ -19,7 +19,7 @@ const getField = (event: React.ChangeEvent<any> | React.FocusEvent<any>, handler
   return { field, value };
 };
 
-const useField = <TValues extends Values>(name: keyof TValues, validator?: FieldValidateHandler) => {
+const useField = <TValues extends Values>(name: keyof TValues, validator?: FieldValidationHandler) => {
   const { dispatch, registerField } = usePerfFormContext<TValues>();
   const isMounted = React.useRef(false);
 

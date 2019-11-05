@@ -1,5 +1,5 @@
 import { usePerfFormSelector } from './usePerfFormSelector';
-import { Values } from '../store/state';
+import { Values } from '../store/types';
 
 const useFormStatus = <TValues extends Values>() => {
   const isSubmitting = usePerfFormSelector<TValues, boolean>(

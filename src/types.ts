@@ -1,4 +1,5 @@
-import { Errors } from './store/state';
+// eslint-disable-next-line import/no-cycle
+import { Errors } from './store/types';
 
 export type ValidationResults<TValues> = Errors<TValues> | undefined
 

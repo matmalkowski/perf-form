@@ -1,8 +1,8 @@
 // eslint-disable-next-line import/no-cycle
-import { isFunction } from 'util';
-import { Thunk } from './createStore';
-import { Errors } from './state';
-import { runFieldValidationHandler, runValidationHandler } from '../validation/runValidateHandler';
+import { Thunk, Errors } from './types';
+import runFieldLevelValidations from '../validation/runFieldLevelValidations';
+import runValidationHandler from '../validation/runValidationHandler';
+
 
 type Action<T> = {
   type: T,
@@ -62,44 +62,26 @@ SetIsValidatingAction =>
 
 // -----------------------------------------------------------------------------
 
-export const runSingleFieldValidator = <TValues>(
-  field: keyof TValues,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any):
-Thunk<TValues, string | undefined> =>
-  (_d, _s, { validation }) => {
-    const validate = validation.validateField[field];
-    return runFieldValidationHandler(value, validate);
-  };
-
-export const runAllFieldValidators = <TValues>(
-  values: TValues):
-Thunk<TValues, Errors<TValues>> =>
-  (_d, _s, { validation }) => {
-    const fieldsToValidate = Object.keys(validation.validateField)
-      .filter(f => isFunction(validation.validateField[f as keyof TValues]));
-
-    const validationResults = fieldsToValidate
-      .map(field => runSingleFieldValidator(field, values[field as keyof TValues]));
-
-    return Promise.all(validationResults).then(fieldError);
-    const validate = validation.validateField[field];
-    return runFieldValidationHandler(value, validate);
-  };
-
-// -----------------------------------------------------------------------------
-
 
 export const validateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
   (dispatch, getState, { validation }) => {
     const { values } = getState();
     return dispatch(setIsValidating(true)).then(() => {
-      runValidationHandler(values, validation.validateForm).then((validationErrors => {
+      Promise.all([
+        runFieldLevelValidations(values, validation.validateField),
+        runValidationHandler(values, validation.validateForm)
+      ]).then(allErrors => {
+        const [fieldLevelErrorsArray, formLevelErrors] = allErrors;
+        const fieldLevelErrors = fieldLevelErrorsArray.reduce((acc, e) => ({ ...acc, ...e }), {});
+        const errors = {
+          ...fieldLevelErrors,
+          ...formLevelErrors
+        };
         const dispatchedErrors = scopeField
-          ? dispatch(setFieldError(scopeField, validationErrors[scopeField]))
-          : dispatch(setErrors(validationErrors));
+          ? dispatch(setFieldError(scopeField, errors[scopeField]))
+          : dispatch(setErrors(errors));
         dispatchedErrors.then(() => dispatch(setIsValidating(false)));
-      }));
+      });
     });
   };
 

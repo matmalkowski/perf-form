@@ -1,7 +1,7 @@
 import React, { HTMLProps } from 'react';
 import useField from '../hooks/useField';
 import debug from '../utils/debug';
-import { FieldValidateHandler } from '../types';
+import { FieldValidationHandler } from '../types';
 
 type AsElement<T> =
   T extends 'input' ? HTMLProps<HTMLInputElement> :
@@ -13,7 +13,7 @@ type OwnProps<T extends 'input' | 'select' | 'textarea'> = {
   as?: T,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   innerRef?: (instance: any) => void;
-  validate?: FieldValidateHandler
+  validate?: FieldValidationHandler
 }
 
 type Props<T extends 'input' | 'select' | 'textarea'> = OwnProps<T> & AsElement<T>

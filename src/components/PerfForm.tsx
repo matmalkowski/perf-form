@@ -3,12 +3,12 @@ import React from 'react';
 import reducer from '../store/reducer';
 import { PerfFormContext } from '../Context';
 import createStore from '../store/createStore';
-import { Values } from '../store/state';
-import { ValidateHandler } from '../types';
+import { ValidationHandler } from '../types';
+import { Values } from '../store/types';
 
 export type FormProps<TValues extends Values> = {
   initialValues: TValues;
-  validate?: ValidateHandler<TValues>;
+  validate?: ValidationHandler<TValues>;
   validateOnBlur?: boolean
   validateOnChange?: boolean,
   validateOnMount?: boolean

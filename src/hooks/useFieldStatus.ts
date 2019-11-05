@@ -1,6 +1,6 @@
 import { usePerfFormSelector } from './usePerfFormSelector';
+import { Values } from '../store/types';
 
-import { Values } from '../store/state';
 
 const useFieldStatus = <TValues extends Values>(name: keyof TValues) => {
   const touched = usePerfFormSelector<TValues, boolean>(
