@@ -1,7 +1,7 @@
 import React from 'react';
 import warning from 'tiny-warning';
 import { usePerfFormSelector } from './usePerfFormSelector';
-import { validateForm, executeChange, executeBlur } from '../store/actions';
+import { executeValidateForm, executeChange, executeBlur } from '../store/actions';
 import usePerfFormContext from './useFormContext';
 import { Values } from '../store/types';
 import { FieldValidationHandler } from '../types';
@@ -34,7 +34,7 @@ const useField = <TValues extends Values>(name: keyof TValues, validator?: Field
 
   React.useEffect(() => {
     if (isMounted.current === false && shouldValidateOnMount) {
-      dispatch(validateForm(name));
+      dispatch(executeValidateForm(name));
     }
     isMounted.current = true;
   },

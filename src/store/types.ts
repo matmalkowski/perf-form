@@ -6,22 +6,19 @@ export type FieldValidators<TValues> = {
   [P in keyof TValues]?: FieldValidationHandler;
 };
 
-export type Decorator<TValues> = {
-  validation: {
-    validateForm?: ValidationHandler<TValues>;
-  }
+export type Callbacks<TValues> = {
+  onSubmit: (values: TValues) => void;
+  validateForm?: ValidationHandler<TValues>;
 }
 
-export type DispatchDecorator<TValues> = {
-  validation: {
-    validateField: FieldValidators<TValues>;
-  }
-} & Decorator<TValues>
+export interface DispatchCallbacks<TValues> extends Callbacks<TValues> {
+  validateField: FieldValidators<TValues>;
+}
 
 export type Thunk<TValues, TReturn = void> = (
   dispatch: Dispatch<TValues>,
   getState: () => FormState<TValues>,
-  decorator: DispatchDecorator<TValues>
+  callbacks: DispatchCallbacks<TValues>
 ) => Promise<TReturn>;
 
 export type Dispatch<TValues, TReturn = void> = (action: Actions<TValues> | Thunk<TValues>) =>

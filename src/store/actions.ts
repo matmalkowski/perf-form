@@ -63,26 +63,24 @@ SetIsValidatingAction =>
 // -----------------------------------------------------------------------------
 
 
-export const validateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
-  (dispatch, getState, { validation }) => {
+export const executeValidateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
+  (dispatch, getState, { validateField, validateForm }) => {
     const { values } = getState();
-    return dispatch(setIsValidating(true)).then(() => {
-      Promise.all([
-        runFieldLevelValidations(values, validation.validateField),
-        runValidationHandler(values, validation.validateForm)
-      ]).then(allErrors => {
-        const [fieldLevelErrorsArray, formLevelErrors] = allErrors;
-        const fieldLevelErrors = fieldLevelErrorsArray.reduce((acc, e) => ({ ...acc, ...e }), {});
-        const errors = {
-          ...fieldLevelErrors,
-          ...formLevelErrors
-        };
-        const dispatchedErrors = scopeField
-          ? dispatch(setFieldError(scopeField, errors[scopeField]))
-          : dispatch(setErrors(errors));
-        dispatchedErrors.then(() => dispatch(setIsValidating(false)));
-      });
-    });
+    return dispatch(setIsValidating(true)).then(() => Promise.all([
+      runFieldLevelValidations(values, validateField),
+      runValidationHandler(values, validateForm)
+    ]).then(allErrors => {
+      const [fieldLevelErrorsArray, formLevelErrors] = allErrors;
+      const fieldLevelErrors = fieldLevelErrorsArray.reduce((acc, e) => ({ ...acc, ...e }), {});
+      const errors = {
+        ...fieldLevelErrors,
+        ...formLevelErrors
+      };
+      const dispatchedErrors = scopeField
+        ? dispatch(setFieldError(scopeField, errors[scopeField]))
+        : dispatch(setErrors(errors));
+      return dispatchedErrors.then(() => dispatch(setIsValidating(false)));
+    }));
   };
 
 // -----------------------------------------------------------------------------
@@ -94,7 +92,7 @@ export const executeChange = <TValues>(field: keyof TValues, value?: any): Thunk
 
     return dispatch(setFieldValue(field, value)).then(() => {
       if (validateOnChange) {
-        return dispatch(validateForm(field));
+        return dispatch(executeValidateForm(field));
       } return Promise.resolve();
     });
   };
@@ -108,7 +106,7 @@ export const executeBlur = <TValues>(field: keyof TValues): Thunk<TValues> =>
 
     return dispatch(setFieldTouched(field, true)).then(() => {
       if (validateOnBlur) {
-        return dispatch(validateForm(field));
+        return dispatch(executeValidateForm(field));
       } return Promise.resolve();
     });
   };
@@ -131,11 +129,22 @@ SubmitFinishAction =>
 
 // -----------------------------------------------------------------------------
 
+export const executeSubmit = <TValues>(): Thunk<TValues> =>
+  (_, getState, { onSubmit }) => {
+    const { values, errors } = getState();
+    if (Object.keys(errors).length === 0) {
+      onSubmit(values);
+    }
+    return Promise.resolve();
+  };
+
 export const submitForm = <TValues>(): Thunk<TValues> =>
   (dispatch, _) =>
     dispatch(submitAttempt())
-      .then(() => dispatch(validateForm()))
-      .then(() => dispatch(submitFinish()));
+      .then(() => dispatch(executeValidateForm()))
+      .then(() => dispatch(executeSubmit()))
+      .catch(e => { throw e; })
+      .finally(() => dispatch(submitFinish()));
 
 
 export type Actions<TValues> =

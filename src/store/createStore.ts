@@ -4,13 +4,13 @@ import { Actions } from './actions';
 import { FieldValidationHandler } from '../types';
 import debug from '../utils/debug';
 import {
-  Decorator, Store, FieldValidators, Thunk, FormState
+  Callbacks, Store, FieldValidators, Thunk, FormState
 } from './types';
 
 const createStore = <TValues>(
   reducer: React.Reducer<FormState<TValues>, Actions<TValues>>,
   initialState: FormState<TValues>,
-  decorator: Decorator<TValues>
+  callbacks: Callbacks<TValues>
 ): Store<TValues> => {
   let subscribers: Array<Function> = [];
   const fieldsValidators: FieldValidators<TValues> = {};
@@ -23,11 +23,8 @@ const createStore = <TValues>(
         dispatch,
         getState,
         {
-          ...decorator,
-          validation: {
-            ...decorator.validation,
-            validateField: fieldsValidators
-          }
+          ...callbacks,
+          validateField: fieldsValidators
         }
       );
     }

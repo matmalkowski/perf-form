@@ -12,6 +12,7 @@ export type FormProps<TValues extends Values> = {
   validateOnBlur?: boolean
   validateOnChange?: boolean,
   validateOnMount?: boolean
+  onSubmit: (values: TValues) => void;
 };
 
 type Props<T extends Values> = React.PropsWithChildren<FormProps<T>>;
@@ -19,7 +20,7 @@ const PerfForm = <TFormValues extends Values>(
   props: Props<TFormValues>
 ) => {
   const {
-    children, initialValues, validate, validateOnBlur, validateOnChange, validateOnMount
+    children, initialValues, validate, onSubmit, validateOnBlur, validateOnChange, validateOnMount
   } = props;
   const store = React.useRef(createStore<TFormValues>(reducer,
     {
@@ -33,9 +34,8 @@ const PerfForm = <TFormValues extends Values>(
       validateOnMount: !!validateOnMount
     },
     {
-      validation: {
-        validateForm: validate
-      }
+      validateForm: validate,
+      onSubmit
     }));
 
   return (<PerfFormContext.Provider value={store.current}>{children}</PerfFormContext.Provider>);
