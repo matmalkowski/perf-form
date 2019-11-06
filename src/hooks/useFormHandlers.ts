@@ -1,7 +1,7 @@
 import React from 'react';
-import { submitForm } from '../store/actions';
 import usePerfFormContext from './useFormContext';
 import { Values } from '../store/types';
+import { submitForm } from '../store/actions/submit';
 
 const useFormHandlers = <TValues extends Values>() => {
   const { dispatch } = usePerfFormContext<TValues>();

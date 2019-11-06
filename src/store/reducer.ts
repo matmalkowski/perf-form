@@ -1,14 +1,12 @@
 import {
-  SET_FIELD_VALUE,
-  SET_FIELD_TOUCHED,
-  SET_ERRORS,
-  SET_FIELD_ERROR,
-  SET_IS_VALIDATING,
-  SUBMIT_ATTEMPT,
-  SUBMIT_FINISH,
   Actions
 } from './actions';
 import { Values, FormState } from './types';
+import {
+  SET_FIELD_VALUE, SET_FIELD_TOUCHED, SET_ERRORS, SET_FIELD_ERROR
+} from './actions/field/types';
+import SET_IS_VALIDATING from './actions/validation/types';
+import { SUBMIT_ATTEMPT, SUBMIT_FINISH } from './actions/submit/types';
 
 const reducer = <TValues extends Values>(
   state: FormState<TValues>,

@@ -2,6 +2,10 @@
 import { FieldValidationHandler, ValidationHandler } from '../types';
 import { Actions } from './actions';
 
+export type Action<T> = {
+  type: T,
+}
+
 export type FieldValidators<TValues> = {
   [P in keyof TValues]?: FieldValidationHandler;
 };
