@@ -51,7 +51,21 @@ const useField = <TValues extends Values>(name: keyof TValues, validator?: Field
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleOnBlur = React.useCallback((event: React.FocusEvent<any>) => {
+  const handleOnBlur = React.useCallback((field: keyof TValues) => {
+    if (field) {
+      dispatch(executeBlur<TValues>(field));
+    }
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const setFieldValue = React.useCallback((field: keyof TValues, value?: any) => {
+    if (field) {
+      dispatch(executeChange<TValues>(field, value));
+    }
+  }, []);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const setFieldTouched = React.useCallback((event: React.FocusEvent<any>) => {
     const { field } = getField(event, 'onBlur');
     if (field) {
       dispatch(executeBlur<TValues>(field));
@@ -67,7 +81,9 @@ const useField = <TValues extends Values>(name: keyof TValues, validator?: Field
   return {
     value,
     handleOnChange,
-    handleOnBlur
+    handleOnBlur,
+    setFieldValue,
+    setFieldTouched
   };
 };
 

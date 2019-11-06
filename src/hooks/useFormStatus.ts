@@ -10,10 +10,14 @@ const useFormStatus = <TValues extends Values>() => {
     state => state.isValidating
   );
 
+  const isValid = usePerfFormSelector<TValues, boolean>(
+    state => Object.keys(state.errors).length === 0
+  );
+
   return {
     isSubmitting,
-    isValidating
-
+    isValidating,
+    isValid
   };
 };
 
