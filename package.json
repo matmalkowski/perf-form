@@ -19,7 +19,9 @@
     "watch": "rollup -c -w --dev",
     "typecheck": "tsc",
     "watch:ts": "yarn emit-declarations --watch",
-    "emit-declarations": "tsc -p tsconfig.json -d --noEmit false --emitDeclarationOnly --isolatedModules false --declarationDir \"./lib/\""
+    "emit-declarations": "tsc -p tsconfig.json -d --noEmit false --emitDeclarationOnly --isolatedModules false --declarationDir \"./lib/\"",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "peerDependencies": {
     "react": "^16.11.0"
@@ -31,6 +33,7 @@
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
     "@babel/preset-typescript": "^7.6.0",
+    "@types/jest": "^24.0.22",
     "@types/react": "^16.9.11",
     "@typescript-eslint/eslint-plugin": "^2.6.0",
     "@typescript-eslint/parser": "^2.6.0",
@@ -40,6 +43,7 @@
     "eslint-plugin-jest": "^23.0.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.16.0",
+    "jest": "^24.9.0",
     "react": "^16.11.0",
     "rimraf": "^3.0.0",
     "rollup": "^1.26.0",
@@ -53,5 +57,12 @@
   },
   "dependencies": {
     "tiny-warning": "^1.0.3"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "**/*.{ts,tsx}",
+      "!**/*.d.ts",
+      "!**/node_modules/"
+    ]
   }
 }
