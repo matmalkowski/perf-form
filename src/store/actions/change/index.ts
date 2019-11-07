@@ -14,8 +14,6 @@ export const executeChange = <TValues>(field: keyof TValues, value?: any): Thunk
     });
   };
 
-// -----------------------------------------------------------------------------
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const executeBlur = <TValues>(field: keyof TValues): Thunk<TValues> =>
   (dispatch, getState) => {
