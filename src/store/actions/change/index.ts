@@ -4,24 +4,22 @@ import { executeValidateForm } from '../validation';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const executeChange = <TValues>(field: keyof TValues, value?: any): Thunk<TValues> =>
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
     const { validateOnChange } = getState();
 
-    return dispatch(setFieldValue(field, value)).then(() => {
-      if (validateOnChange) {
-        return dispatch(executeValidateForm(field));
-      } return Promise.resolve();
-    });
+    await dispatch(setFieldValue(field, value));
+    if (validateOnChange) {
+      return dispatch(executeValidateForm(field));
+    } return Promise.resolve();
   };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const executeBlur = <TValues>(field: keyof TValues): Thunk<TValues> =>
-  (dispatch, getState) => {
+  async (dispatch, getState) => {
     const { validateOnBlur } = getState();
 
-    return dispatch(setFieldTouched(field, true)).then(() => {
-      if (validateOnBlur) {
-        return dispatch(executeValidateForm(field));
-      } return Promise.resolve();
-    });
+    await dispatch(setFieldTouched(field, true));
+    if (validateOnBlur) {
+      return dispatch(executeValidateForm(field));
+    } return Promise.resolve();
   };
