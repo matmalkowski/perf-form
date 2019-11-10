@@ -9,21 +9,23 @@ SetIsValidatingAction =>
   ({ type: SET_IS_VALIDATING, payload: { isValidating } });
 
 export const executeValidateForm = <TValues>(scopeField?: keyof TValues): Thunk<TValues> =>
-  (dispatch, getState, { validateField, validateForm }) => {
+  async (dispatch, getState, { validateField, validateForm }) => {
     const { values } = getState();
-    return dispatch(setIsValidating(true)).then(() => Promise.all([
+    await dispatch(setIsValidating(true));
+    const [fieldLevelErrorsArray, formLevelErrors] = await Promise.all([
       runFieldLevelValidations(values, validateField),
       runValidationHandler(values, validateForm)
-    ]).then(allErrors => {
-      const [fieldLevelErrorsArray, formLevelErrors] = allErrors;
-      const fieldLevelErrors = fieldLevelErrorsArray.reduce((acc, e) => ({ ...acc, ...e }), {});
-      const errors = {
-        ...fieldLevelErrors,
-        ...formLevelErrors
-      };
-      const dispatchedErrors = scopeField
-        ? dispatch(setFieldError(scopeField, errors[scopeField]))
-        : dispatch(setErrors(errors));
-      return dispatchedErrors.then(() => dispatch(setIsValidating(false)));
-    }));
+    ]);
+    const fieldLevelErrors = fieldLevelErrorsArray.reduce((acc, e) => ({ ...acc, ...e }), {});
+    const errors = {
+      ...fieldLevelErrors,
+      ...formLevelErrors
+    };
+    if (scopeField) {
+      await dispatch(setFieldError(scopeField, errors[scopeField]));
+    } else {
+      await dispatch(setErrors(errors));
+    }
+
+    return dispatch(setIsValidating(false));
   };
