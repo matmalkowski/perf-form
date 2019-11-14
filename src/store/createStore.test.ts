@@ -1,4 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-underscore-dangle */
 import createStore from './createStore';
+import debug from '../utils/debug';
+
+jest.mock('../utils/debug');
 
 describe('createStore', () => {
   const reducer = jest.fn();
@@ -134,5 +139,14 @@ describe('createStore', () => {
     await dispatch({ type: 'SET_IS_VALIDATING', payload: { isValidating: true } });
     expect(reducer).toHaveBeenCalledTimes(1);
     expect(getState()).toStrictEqual({ a: 'next' });
+  });
+
+  it('should call debug on debug mode', async () => {
+    (global as any).__DEV__ = true;
+    const {
+      dispatch
+    } = createStore(reducer, initialState, decoratorCallbacks);
+    await dispatch({ type: 'SET_IS_VALIDATING', payload: { isValidating: true } });
+    expect(debug).toHaveBeenCalledTimes(1);
   });
 });
