@@ -14,11 +14,11 @@ const createStore = <TValues>(
 ): Store<TValues> => {
   let subscribers: Array<Function> = [];
   const fieldsValidators: FieldValidators<TValues> = {};
-  let state = reducer(initialState as FormState<TValues>, { type: '__INIT__' } as unknown as Actions<TValues>);
+  let state = initialState;
 
   const getState = () => state;
   const dispatch = (action: Actions<TValues> | Thunk<TValues>): Promise<void> => {
-    if (action instanceof Function) {
+    if (typeof (action) === 'function') {
       return action(
         dispatch,
         getState,

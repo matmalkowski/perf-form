@@ -60,6 +60,9 @@
     "tiny-warning": "^1.0.3"
   },
   "jest": {
+    "globals": {
+      "__DEV__": false
+    },
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",
       "!**/*.d.ts",
