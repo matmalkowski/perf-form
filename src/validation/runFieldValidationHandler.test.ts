@@ -40,6 +40,13 @@ describe('runFieldValidationHandler', () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
+  it('should resolve handler promise without errors if handler is async and no returns falsy results', async () => {
+    const handler = jest.fn().mockResolvedValue('');
+    const results = await runFieldValidationHandler('a', 1, handler);
+    expect(results).toEqual({});
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
   it('should resolve handler with errors if handler is sync function', async () => {
     const handler = jest.fn().mockReturnValue('some error');
     const results = await runFieldValidationHandler('a', 1, handler);
